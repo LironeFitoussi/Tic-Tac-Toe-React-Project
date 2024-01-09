@@ -4,21 +4,48 @@ import Log from "./components/Log";
 import { useState } from "react"
 
 function App() {
+  const [gameTurns, setGameTurns] = useState([]);
   const [activePlayer, setActivePlayer] = useState('X');
-  const [turns, setGameTurns] = useState([]);
-  function handleSelectSquare() {
+
+  function handleSelectSquare(rowIndex, colIndex) {
     setActivePlayer((curActivePlayer) => curActivePlayer === 'X' ? 'O' : 'X');
-    setGameTurns();
-  }
+    setGameTurns(prevTurns => {
+      let currentPlayer = 'X'
+
+      if (prevTurns.length > 0 && prevTurns[0].player === 'X') {
+        currentPlayer = 'O';
+      };
+
+      const updatedTurns = [
+        { square: { row: rowIndex, col: colIndex }, player: activePlayer },
+        ...prevTurns,
+      ];
+
+      return updatedTurns;
+    });
+  };
+
   return (
     <main>
       <div id="game-container">
         <ol id="players" className="highlight-player">
-          <Player initName="Player1" symbol="X" isActive={activePlayer === 'X' ? true : false} />
-          <Player initName="Player2" symbol="O" isActive={activePlayer === 'O' ? true : false} />
+          <Player
+            initName="Player1"
+            symbol="X"
+            isActive={activePlayer === 'X' ? true : false}
+          />
+          <Player
+            initName="Player2"
+            symbol="O"
+            isActive={activePlayer === 'O' ? true : false}
+          />
         </ol>
-        <GameBoard onSelectSquare={handleSelectSquare} activePlayerSymbol={activePlayer} />
+        <GameBoard
+          onSelectSquare={handleSelectSquare}
+          turns={gameTurns}
+        />
       </div>
+      <Log turns={gameTurns} />
     </main>
   )
 }
